@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="locale" content="US">
+    <meta name="language" content="en">
+    <meta name="country" content="US">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Lighthouse Admin Portal</title>
+    <link rel="stylesheet" href="https://scripts.cisco.com/cui/1.3.0/css/cui-standard.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/picomodal/3.0.0/picoModal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+    </head>
+<body class="cui">
+        <div class="content-fluid">
+            <main>
+                <header class="header header--tall">
+                    <div class="header-bar container">
+                        <a href="http://www.cisco.com/" class="header-bar__logo">
+                            <span class="icon-cisco"></span>
+                        </a>
+                        <div class="header-bar__main">
+                            <div class="header-breadcrumbs">
+                            </div>
+                            <div class="header-heading">
+                                <h1 class="page-title"><img src='https://i.imgur.com/f0vBigO.jpg' alt=''>&nbsp;&nbsp;&nbsp;Lighthouse Admin Portal</h1>
+                            </div>
+                            <div class="header-menus">
+                                <ul class="nav nav-tabs">
+                                    <li class="tab">
+                                        <a href="index.html"><div class="tab__heading" title="About">About</div></a>
+                                    </li>
+                                    <li class="tab">
+                                        <a href="guide.html"><div class="tab__heading" title="Guidelines">Guidelines</div></a>
+                                    </li>
+                                    <li class="tab active">
+                                        <a href="user_view.html"><div class="tab__heading" title="View">View</div></a>
+                                    </li>
+                                    <li class="tab">
+                                        <a href="add_update.html"><div class="tab__heading" title="Add/Update">Add/Update</div></a>
+                                    </li>
+                                    <li class="tab">
+                                        <a id ="admin" href="admin.html"><div class="tab__heading" title="Admin">Admin</div></a>
+                                    </li>
+                                    <li class="tab">
+                                    <a id="stats" href="get_stats.html"><div class="tab__heading" title="Stats">Stats</div></a>
+                                </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="header-toolbar">
+                            <a href="mailto:lighthouse-csone@cisco.com?Subject=Lighthouse Admin Portal Feedback" class="btn btn--icon">
+                                <span class="icon-alert"></span>
+                            </a>
+                            <span>&emsp;Feedback</span>
+                        </div>
+                    </div>
+                </header>
+                <div id="loading" class="loading-dots loading-dots--info">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="content">
+                    <div class="container">
+                        <div class="section">
+                            <div class="text-center">
+                                <h1>View the data for selected Platform and Technology</h1>
+                                <div>
+                                <table id="pf_tbl" class="table">
+                                <tbody><tr>
+                                    <td id="platform_select_text" width="45%" align="left"><b>Select platform from the list:</b></td>
+                                    <td id="platform_select" width="45%"><select id="platform_list" style="width:100%"></select></td>
+                                </tr></tbody></table>
+
+                                <table id="tech_tbl" class="table">
+                                <tbody><tr>
+                                    <td id="tech_selection_text" width="45%" align="left"><b>Select technology from the list:</b></td>
+                                    <td id="tech_selection" width="45%"><select id="tech_list" style="width:100%"></select></td>
+                                </tr></tbody></table>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="section">
+                        <div class="text-center">
+                        <span><button class="btn btn--negative" onclick="reset_all()">Reset</button></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <footer class="footer footer--basic">
+                    <div class="footer__links">
+                        <ul class="list">
+                            <li><a href="http://www.cisco.com/cisco/web/siteassets/contacts/index.html" target="_blank">Contacts</a></li>
+                            <li><a href="https://secure.opinionlab.com/ccc01/o.asp?id=jBjOhqOJ" target="_blank">Feedback</a></li>
+                            <li><a href="https://www.cisco.com/c/en/us/about/help.html" target="_blank">Help</a></li>
+                            <li><a href="http://www.cisco.com/c/en/us/about/sitemap.html" target="_blank">Site Map</a></li>
+                            <li><a href="https://www.cisco.com/c/en/us/about/legal/terms-conditions.html" target="_blank">Terms & Conditions</a></li>
+                            <li><a href="https://www.cisco.com/c/en/us/about/legal/privacy-full.html" target="_blank">Privacy Statement</a></li>
+                            <li><a href="https://www.cisco.com/c/en/us/about/legal/privacy-full.html#cookies" target="_blank">Cookie Policy</a></li>
+                            <li><a href="https://www.cisco.com/c/en/us/about/legal/trademarks.html" target="_blank">Trademarks</a></li>
+                        </ul>
+                    </div>
+                </footer>
+            </main>
+        </div>
+    </body>
+
+<script>
+
+$(document).ready(function(){
+    get_cleared();
+    get_admin();
+    get_pf_list();
+    });
+
+$( document ).ajaxStart(function() {
+        $( "#loading" ).show();
+    });
+
+$( document ).ajaxStop(function() {
+        $( "#loading" ).hide();
+});
+    
+var link = '/api/v2/jobs/lighthouse_v3_backend';
+var task_name = "lighthouse_v3_backend";
+    
+    
+function get_cleared(){
+    $("#tech_tbl").hide();
+    $("#admin").hide();
+    $("#stats").hide();
+    $("#status").val("");
+    $('option', $('#tech_list')).remove();
+}
+    
+    
+function PaneOpen(html){
+  var user_view_modal = picoModal({
+      content: html,
+      overlayClose: false,
+      closeButton: true,
+      width: "85%",
+  });
+  return user_view_modal;
+}
+
+
+function get_admin(){
+    var inputs = {"action":"get_admin_status"};
+    var post_data = {name: task_name, input: inputs};
+    $.post({url: link, dataType: "json", data: post_data})
+    .done(function(result){
+       if(result.data.variables._0){
+           console.log(result.data.variables._0);
+           $("#admin").show();
+           $("#stats").show();
+       }
+    });
+}
+
+
+function get_pf_list(){
+    var inputs = {"action":"get_platform_list"};
+    var post_data = {name: task_name, input: inputs};
+    $.post({url: link, dataType: "json", data: post_data})
+    .done(function(result){
+       if(result.data.variables._0){
+           console.log(result.data.variables._0);
+           var pf_list = result.data.variables._0;
+           var select = $('#platform_list');
+           var options = select.prop('options');
+           $('option', select).remove();
+           options[options.length] = new Option("Platform selection", 'default', true, true);
+           $.each(pf_list, function(val, text) {
+               options[options.length] = new Option(text, text);
+           });
+       }
+    });
+}
+
+
+$("#platform_list").change(function(){
+    $('option', $('#tech_list')).remove();
+    $("#tech_tbl").show();
+    $("#tech_selection_text").show();
+    $("#tech_selection").show();
+    $("#tech_selection").attr("width", "50%");
+    $("#tech_selection_text").attr("width", "50%");
+    $("#platform_select_text").attr("width", "50%");
+    $("#platform_select").attr("width", "50%");
+    var inputs = {"action":"get_technology_list", "platform" : $('#platform_list').val()};
+    var post_data = {name: task_name, input: inputs};
+    $.post({url: link, dataType: "json", data: post_data})
+    .done(function(result){
+        if(result.data.variables._0){
+            console.log(result.data.variables._0);
+            var tech_list = result.data.variables._0;
+            var select = $('#tech_list');
+            var options = select.prop('options');
+            $('option', select).remove();
+            options[options.length] = new Option("Technology selection", 'default', true, true);
+            $.each(tech_list, function(val, text) {
+                options[options.length] = new Option(text, text);
+            });
+        }
+    });
+});
+
+
+$("#tech_list").change(function(){
+    $("#tech_selection_text").attr("width", "50%");
+    $("#tech_selection").attr("width", "50%");
+    var plat = $('#platform_list').val();
+    var tech = $('#tech_list').val();
+    var inputs = {"action":"get_technology_formatted", "platform" : plat, "technology" : tech};
+    var post_data = {name: task_name, input: inputs};
+    $.post({url: link, dataType: "json", data: post_data})
+    .done(function(result){
+       if(result.data.variables._0){
+           console.log(result.data.variables._0);
+           user_view_modal = PaneOpen(result.data.variables._0);
+           user_view_modal.show();
+       }
+    });
+});
+
+
+function reset_all(){
+    $('option', $('#tech_list')).remove();
+    $('option', $('#platform_list')).remove();
+    $("#tech_tbl").hide();
+    $("#admin").hide();
+    $("#stats").hide();
+    $("#platform_select_text").show();
+    $("#platform_select").show();
+    $("#tech_selection_text").show();
+    $("#tech_selection").show();
+    $("#platform_select_text").attr("width", "44%");
+    $("#platform_select").attr("width", "44%");
+    $("#tech_selection").attr("width", "44%");
+    $("#tech_selection_text").attr("width", "44%");
+    get_admin();
+    get_pf_list();;
+}
+
+</script>
+</html>

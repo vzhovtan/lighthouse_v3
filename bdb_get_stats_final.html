@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="locale" content="US">
+    <meta name="language" content="en">
+    <meta name="country" content="US">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Lighthouse Admin Portal</title>
+    <link rel="stylesheet" href="https://scripts.cisco.com/cui/1.3.0/css/cui-standard.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+</head>
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 5px;
+    text-align: left;
+}
+</style>
+<body class="cui">
+    <div class="content-fluid">
+        <main>
+            <header class="header header--tall">
+                    <div class="header-bar container">
+                        <a href="http://www.cisco.com/" class="header-bar__logo">
+                            <span class="icon-cisco"></span>
+                        </a>
+                        <div class="header-bar__main">
+                            <div class="header-breadcrumbs">
+                            </div>
+                            <div class="header-heading">
+                                <h1 class="page-title"><img src='https://i.imgur.com/f0vBigO.jpg' alt=''>&nbsp;&nbsp;&nbsp;Lighthouse Admin Portal</h1>
+                            </div>
+                            <div class="header-menus">
+                                <ul class="nav nav-tabs">
+                                    <li class="tab">
+                                        <a href="index.html"><div class="tab__heading" title="About">About</div></a>
+                                    </li>
+                                    <li class="tab">
+                                        <a href="guide.html"><div class="tab__heading" title="Guidelines">Guidelines</div></a>
+                                    </li>
+                                    <li class="tab">
+                                        <a href="user_view.html"><div class="tab__heading" title="View">View</div></a>
+                                    </li>
+                                    <li class="tab">
+                                        <a href="add_update.html"><div class="tab__heading" title="Add/Update">Add/Update</div></a>
+                                    </li>
+                                    <li class="tab">
+                                        <a id ="admin" href="admin.html"><div class="tab__heading" title="Admin">Admin</div></a>
+                                    </li>
+                                    <li class="tab active">
+                                    <a id="stats" href="get_stats.html"><div class="tab__heading" title="Stats">Stats</div></a>
+                                </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="header-toolbar">
+                            <a href="mailto:lighthouse-csone@cisco.com?Subject=Lighthouse Admin Portal Feedback" class="btn btn--icon">
+                                <span class="icon-alert"></span>
+                            </a>
+                            <span>&emsp;Feedback</span>
+                        </div>
+                    </div>
+                </header>
+                <div id="loading" class="loading-dots loading-dots--info">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="content">
+                <div class="container">
+                    <div class="section">
+                        <div class="text-center">
+                            <h1>Statistics</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align:center" id="counter"></div>
+            <div style="text-align:center" id="stats_text"><h4><b>Feedbacks</b></h4></div>
+            <div style="justify-content:center" id="stats_form">
+            </div>
+            
+            <div id="btns" class="container">
+                <div class="section">
+                    <div class="text-center">
+                            <span ><button class="btn" onclick="get_stats_as_csv()">Get feedback stat as CSV file</button></span>
+                    </div>
+                </div>
+            </div>
+            
+        <footer class="footer footer--basic">
+        <div class="footer__links">
+        <ul class="list">
+        <li><a href="http://www.cisco.com/cisco/web/siteassets/contacts/index.html" target="_blank">Contacts</a></li>
+        <li><a href="https://secure.opinionlab.com/ccc01/o.asp?id=jBjOhqOJ" target="_blank">Feedback</a></li>
+        <li><a href="https://www.cisco.com/c/en/us/about/help.html" target="_blank">Help</a></li>
+        <li><a href="http://www.cisco.com/c/en/us/about/sitemap.html" target="_blank">Site Map</a></li>
+        <li><a href="https://www.cisco.com/c/en/us/about/legal/terms-conditions.html" target="_blank">Terms & Conditions</a></li>
+        <li><a href="https://www.cisco.com/c/en/us/about/legal/privacy-full.html" target="_blank">Privacy Statement</a></li>
+        <li><a href="https://www.cisco.com/c/en/us/about/legal/privacy-full.html#cookies" target="_blank">Cookie Policy</a></li>
+        <li><a href="https://www.cisco.com/c/en/us/about/legal/trademarks.html" target="_blank">Trademarks</a></li>
+        </ul>
+        </div>
+        </footer>
+        </main>
+    </div>
+</div>
+</div>
+</div>
+
+</body>
+<div class="modal modal--small" id="modal-small" style="visibility:hidden">
+    <div class="modal__dialog">
+        <div class="modal__content">
+            <div class="modal__body">
+                <p class="subtitle" id="subtitle"></p>
+            </div>
+            <div class="modal__footer">
+                <button class="btn" onclick="closeModal('modal-small')">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+$(document).ready(function(){
+    $("#stats_form").hide()
+    $("#stats_text").hide();;
+    $("#counter").hide();
+    $("#btns").hide();
+    get_admin();
+    });
+
+$( document ).ajaxStart(function() {
+        $( "#loading" ).show();
+    });
+
+$( document ).ajaxStop(function() {
+        $( "#loading" ).hide();
+});
+
+var link = '/api/v2/jobs/lighthouse_v3_statistics';
+var task_name = "lighthouse_v3_statistics";
+
+
+function get_admin(){
+    var inputs = {"action":"get_admin_status"};
+    var post_data = {name: task_name, input: inputs};
+    $.post({url: link, dataType: "json", data: post_data})
+    .done(function(result){
+       if(result.data.variables._0){
+           console.log(result.data.variables._0);
+           get_stats();
+           get_counter();
+       } else{
+        openModal("Not authorized");
+       }
+    });
+}
+
+
+function get_counter(){
+    var inputs = {"action":"get_counter"};
+    var post_data = {name: task_name, input: inputs};
+    $.post({url: link, dataType: "json", data: post_data})
+    .done(function(result){
+       if(result.data.variables._0){
+           console.log(result.data.variables._0);
+           var output = "<h4><b>Total usage: " + result.data.variables._0 + "</b></h4><br><br>";
+           $("#counter").html(output);
+           $("#counter").show();
+          }
+    });
+}
+
+
+function get_stats(){
+    var inputs = {"action":"get_stats"};
+    var post_data = {name: task_name, input: inputs};
+    $.post({url: link, dataType: "json", data: post_data})
+    .done(function(result){
+       if(result.data.variables._0){
+           var txt = '<table style="width:85%; margin:0 auto"> <tr><th>SR number</th><th>Platform</th><th>Technology</th><th>Feedback</th></tr>';
+           console.log(result.data.variables._0);
+           stats = result.data.variables._0;
+           for (i = 0; i < stats.length; i++){
+               txt += "<tr>";
+               for (x in stats[i]) {
+                   txt += "<td>" + stats[i][x]+ "</td>";
+               }
+               txt += "</tr>";
+           }
+           txt += "</table>";
+           $("#stats_form").html(txt);
+           $("#stats_text").show();;
+           $("#stats_form").show();
+           $("#btns").show();
+          }
+    });
+}
+
+
+function get_stats_as_csv(){
+    var inputs = {"action":"get_stats_as_csv"};
+    var post_data = {name: task_name, input: inputs};
+    $.post({url: link, dataType: "json", data: post_data})
+    .done(function(result){
+        if(result.data.variables._0){
+            console.log(result.data.variables._0);
+            var message = "<a target='_blank' href='https://scripts.cisco.com/api/v2/files/" + result.data.variables._0 + "'>Click here to download CSV file.</a>"
+            openModal(message);
+            }
+        });
+}
+
+
+function openModal(text){
+    document.getElementById("modal-small").style.visibility = "visible";
+    document.getElementById("subtitle").innerHTML = text;
+    }
+
+
+function closeModal(){
+    document.getElementById("subtitle").innerHTML = "";
+    document.getElementById("modal-small").style.visibility = "hidden"
+    }
+
+
+</script>
+</html>
