@@ -1,4 +1,4 @@
-# Lighthouse V3
+## Lighthouse V3
 
 Lighthouse is internal project and uses data saved in MongoDB 
 Lighthouse is developed by engineers for engineers providing common resource of useful commands and support links to help in troubleshooting.
